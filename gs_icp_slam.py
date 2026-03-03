@@ -147,7 +147,10 @@ class GS_ICP_SLAM(SLAMParameters):
             depth_file = os.listdir(depth_folder)[0]
             rgb_image = cv2.imread(os.path.join(rgb_folder, rgb_file))
             depth_image = np.array(o3d.io.read_image(os.path.join(depth_folder, depth_file))).astype(np.float32)
-        
+        elif self.camera_parameters[8] == "realsense":
+            rgb_image = cv2.imread(self.trajmanager.color_paths[0])
+            depth_image = np.array(o3d.io.read_image(self.trajmanager.depth_paths[0])).astype(np.float32)
+
         return rgb_image, depth_image
 
     def run_viewer(self, lower_speed=True):

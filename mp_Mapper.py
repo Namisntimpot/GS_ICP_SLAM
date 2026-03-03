@@ -328,15 +328,20 @@ class Mapper(SLAMParameters):
                 depth_paths.append(f"{self.dataset_path}/depth_images/{depth_image_name}.png")
                 
             return color_paths, depth_paths
-        elif self.trajmanager.which_dataset == "tum":
+        elif self.trajmanager.which_dataset in ("tum", "realsense"):
             return self.trajmanager.color_paths, self.trajmanager.depth_paths
 
     
     def calc_2d_metric(self):
+        if self.trajmanager.which_dataset == "realsense":
+            print("Skipping 2D metrics (no ground truth for realsense data)")
+            if self.save_results:
+                self.gaussians.save_ply(os.path.join(self.output_path, "scene.ply"))
+            return
         psnrs = []
         ssims = []
         lpips = []
-        
+
         cal_lpips = LearnedPerceptualImagePatchSimilarity(net_type='alex', normalize=True).to("cuda")
         original_resolution = True
         image_names, depth_image_names = self.get_image_dirs(self.dataset_path)

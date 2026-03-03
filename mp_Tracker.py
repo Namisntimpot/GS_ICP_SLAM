@@ -331,7 +331,10 @@ class Tracker(SLAMParameters):
         self.end_of_dataset[0] = 1
         
         print(f"System FPS: {1/((time.time()-self.total_start_time)/self.num_images):.2f}")
-        print(f"ATE RMSE: {self.evaluate_ate(self.trajmanager.gt_poses, self.poses)*100.:.2f}")
+        if self.trajmanager.which_dataset == "realsense":
+            print("ATE RMSE: N/A (no ground truth)")
+        else:
+            print(f"ATE RMSE: {self.evaluate_ate(self.trajmanager.gt_poses, self.poses)*100.:.2f}")
 
     
     def get_images(self, images_folder):
@@ -350,7 +353,7 @@ class Tracker(SLAMParameters):
                 rgb_images.append(rgb_image)
                 depth_images.append(depth_image)
             return rgb_images, depth_images
-        elif self.trajmanager.which_dataset == "tum":
+        elif self.trajmanager.which_dataset in ("tum", "realsense"):
             for i in tqdm(range(len(self.trajmanager.color_paths))):
                 rgb_image = cv2.imread(self.trajmanager.color_paths[i])
                 depth_image = np.array(o3d.io.read_image(self.trajmanager.depth_paths[i]))

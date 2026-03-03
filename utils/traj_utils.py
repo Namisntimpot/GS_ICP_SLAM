@@ -20,10 +20,12 @@ class TrajManager:
             self.gt_poses = self.tum_load_poses(self.dataset_path + '/traj.txt')
         elif self.which_dataset == "replica":
             self.gt_poses = self.replica_load_poses(self.dataset_path + '/traj.txt')
+        elif self.which_dataset == "realsense":
+            self.gt_poses = self.realsense_load_poses(self.dataset_path)
         else:
             print("Unknown dataset!")
             sys.exit()
-        
+
         self.gt_poses_vis = np.array([x[:3, 3] for x in self.gt_poses])
 
     def quaternion_rotation_matrix(self, Q, t):
@@ -113,6 +115,18 @@ class TrajManager:
         
         return np.array(poses)
     
+    def realsense_load_poses(self, dataset_path):
+        """No ground truth poses for RealSense data. Return identity placeholders."""
+        rgb_folder = os.path.join(dataset_path, "rgb")
+        depth_folder = os.path.join(dataset_path, "depth")
+        rgb_files = sorted(os.listdir(rgb_folder))
+        depth_files = sorted(os.listdir(depth_folder))
+        num_frames = min(len(rgb_files), len(depth_files))
+        self.color_paths = [os.path.join(rgb_folder, f) for f in rgb_files[:num_frames]]
+        self.depth_paths = [os.path.join(depth_folder, f) for f in depth_files[:num_frames]]
+        poses = [np.eye(4) for _ in range(num_frames)]
+        return np.array(poses)
+
     def parse_list(self, filepath, skiprows=0):
         data = np.loadtxt(filepath, delimiter=' ',
                           dtype=np.unicode_, skiprows=skiprows)
