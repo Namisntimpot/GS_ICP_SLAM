@@ -45,7 +45,6 @@ class Mapper(SLAMParameters):
         self.fy = slam.fy
         self.cx = slam.cx
         self.cy = slam.cy
-        self.depth_scale = slam.depth_scale
         self.depth_trunc = slam.depth_trunc
         self.cam_intrinsic = np.array([[self.fx, 0., self.cx],
                                        [0., self.fy, self.cy],
@@ -56,7 +55,7 @@ class Mapper(SLAMParameters):
         self.keyframe_freq = slam.keyframe_freq
         
         # Camera poses
-        self.trajmanager = TrajManager(self.camera_parameters[8], self.dataset_path)
+        self.trajmanager = TrajManager(self.camera_parameters[7], self.dataset_path)
         self.poses = [self.trajmanager.gt_poses[0]]
         # Keyframes(added to map gaussians)
         self.keyframe_idxs = []
