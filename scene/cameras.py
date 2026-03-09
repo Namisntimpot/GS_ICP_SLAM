@@ -11,7 +11,7 @@
 
 import torch
 import numpy as np
-from utils.graphics_utils import getWorld2View2, getProjectionMatrix
+from recon.gsicp.utils.graphics_utils import getWorld2View2, getProjectionMatrix
 import cv2
 import torch.nn as nn
 import time

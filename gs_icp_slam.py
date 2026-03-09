@@ -8,15 +8,14 @@ import numpy as np
 import open3d as o3d
 import time
 import rerun as rr
-sys.path.append(os.path.dirname(__file__))
 from argparse import ArgumentParser
-from arguments import SLAMParameters
-from utils.traj_utils import TrajManager
-from utils.graphics_utils import focal2fov
-from scene.shared_objs import SharedCam, SharedGaussians, SharedPoints, SharedTargetPoints
-from gaussian_renderer import render, network_gui
-from mp_Tracker import Tracker
-from mp_Mapper import Mapper
+from recon.gsicp.arguments import SLAMParameters
+from recon.gsicp.utils.traj_utils import TrajManager
+from recon.gsicp.utils.graphics_utils import focal2fov
+from recon.gsicp.scene.shared_objs import SharedCam, SharedGaussians, SharedPoints, SharedTargetPoints
+from recon.gsicp.gaussian_renderer import render, network_gui
+from recon.gsicp.mp_Tracker import Tracker
+from recon.gsicp.mp_Mapper import Mapper
 
 torch.multiprocessing.set_sharing_strategy('file_system')
 

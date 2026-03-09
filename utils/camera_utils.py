@@ -9,10 +9,10 @@
 # For inquiries contact  george.drettakis@inria.fr
 #
 
-from scene.cameras import Camera
+from recon.gsicp.scene.cameras import Camera
 import numpy as np
-from utils.general_utils import PILtoTorch
-from utils.graphics_utils import fov2focal
+from recon.gsicp.utils.general_utils import PILtoTorch
+from recon.gsicp.utils.graphics_utils import fov2focal
 
 WARNED = False
 

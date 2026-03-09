@@ -9,12 +9,11 @@ import cv2
 import numpy as np
 import time
 import rerun as rr
-sys.path.append(os.path.dirname(__file__))
-from arguments import SLAMParameters
-from utils.traj_utils import TrajManager
-from utils.loss_utils import l1_loss, ssim
-from scene import GaussianModel
-from gaussian_renderer import render, render_3, network_gui
+from recon.gsicp.arguments import SLAMParameters
+from recon.gsicp.utils.traj_utils import TrajManager
+from recon.gsicp.utils.loss_utils import l1_loss, ssim
+from recon.gsicp.scene import GaussianModel
+from recon.gsicp.gaussian_renderer import render, render_3, network_gui
 from tqdm import tqdm
 from torchmetrics.image.lpip import LearnedPerceptualImagePatchSimilarity
 import open3d as o3d

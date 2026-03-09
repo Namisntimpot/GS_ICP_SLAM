@@ -10,16 +10,16 @@
 #
 
 import torch
-from scene import Scene
+from recon.gsicp.scene import Scene
 import os
 from tqdm import tqdm
 from os import makedirs
-from gaussian_renderer import render
+from recon.gsicp.gaussian_renderer import render
 import torchvision
-from utils.general_utils import safe_state
+from recon.gsicp.utils.general_utils import safe_state
 from argparse import ArgumentParser
-from arguments import ModelParams, PipelineParams, get_combined_args
-from gaussian_renderer import GaussianModel
+from recon.gsicp.arguments import ModelParams, PipelineParams, get_combined_args
+from recon.gsicp.gaussian_renderer import GaussianModel
 
 def render_set(model_path, name, iteration, views, gaussians, pipeline, background):
     render_path = os.path.join(model_path, name, "ours_{}".format(iteration), "renders")

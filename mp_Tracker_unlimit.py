@@ -11,10 +11,9 @@ import pygicp
 import time
 from scipy.spatial.transform import Rotation
 import rerun as rr
-sys.path.append(os.path.dirname(__file__))
-from arguments import SLAMParameters
-from utils.traj_utils import TrajManager
-from gaussian_renderer import render, render_2, network_gui
+from recon.gsicp.arguments import SLAMParameters
+from recon.gsicp.utils.traj_utils import TrajManager
+from recon.gsicp.gaussian_renderer import render, render_2, network_gui
 from tqdm import tqdm
 
 

@@ -12,11 +12,11 @@
 import os
 import random
 import json
-from utils.system_utils import searchForMaxIteration
-from scene.dataset_readers import sceneLoadTypeCallbacks
-from scene.gaussian_model import GaussianModel
-from arguments import ModelParams
-from utils.camera_utils import cameraList_from_camInfos, camera_to_JSON
+from recon.gsicp.utils.system_utils import searchForMaxIteration
+from recon.gsicp.scene.dataset_readers import sceneLoadTypeCallbacks
+from recon.gsicp.scene.gaussian_model import GaussianModel
+from recon.gsicp.arguments import ModelParams
+from recon.gsicp.utils.camera_utils import cameraList_from_camInfos, camera_to_JSON
 from torch import nn
 
 class Scene(nn.Module):
