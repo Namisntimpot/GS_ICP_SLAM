@@ -107,6 +107,20 @@ class Mapper(SLAMParameters):
     
     def run(self):
         self.mapping()
+
+    def _add_new_gaussians(self, with_trackable_filter=False):
+        points, colors, rots, scales, z_values, trackable_filter = self.shared_new_gaussians.get_values()
+        if with_trackable_filter:
+            self.gaussians.add_from_pcd2_tensor(points, colors, rots, scales, z_values, trackable_filter)
+        else:
+            self.gaussians.add_from_pcd2_tensor(points, colors, rots, scales, z_values, [])
+
+    def _add_keyframe(self):
+        newcam = copy.deepcopy(self.shared_cam)
+        newcam.on_cuda()
+        self.mapping_cams.append(newcam)
+        self.keyframe_idxs.append(newcam.cam_idx[0])
+        self.new_keyframes.append(len(self.mapping_cams)-1)
     
     def mapping(self):
         t = torch.zeros((1,1)).float().cuda()
@@ -149,6 +163,7 @@ class Mapper(SLAMParameters):
         self.new_keyframes.append(len(self.mapping_cams)-1)
 
         new_keyframe = False
+        self._mapping_iter_time = 0
         while True:
             if self.end_of_dataset[0]:
                 break
@@ -157,11 +172,8 @@ class Mapper(SLAMParameters):
                 self.run_viewer()       
             
             if self.is_tracking_keyframe_shared[0]:
-                # get shared gaussians
-                points, colors, rots, scales, z_values, trackable_filter = self.shared_new_gaussians.get_values()
-                
                 # Add new gaussians to map gaussians
-                self.gaussians.add_from_pcd2_tensor(points, colors, rots, scales, z_values, trackable_filter)
+                self._add_new_gaussians(with_trackable_filter=True)
 
                 # Allocate new target points to shared memory
                 target_points, target_rots, target_scales  = self.gaussians.get_trackable_gaussians_tensor(self.trackable_opacity_th)
@@ -169,31 +181,22 @@ class Mapper(SLAMParameters):
                 self.target_gaussians_ready[0] = 1
 
                 # Add new keyframe
-                newcam = copy.deepcopy(self.shared_cam)
-                newcam.on_cuda()
-            
-                self.mapping_cams.append(newcam)
-                self.keyframe_idxs.append(newcam.cam_idx[0])
-                self.new_keyframes.append(len(self.mapping_cams)-1)
+                self._add_keyframe()
+
                 self.is_tracking_keyframe_shared[0] = 0
 
-            elif self.is_mapping_keyframe_shared[0]:
-                # get shared gaussians
-                points, colors, rots, scales, z_values, _ = self.shared_new_gaussians.get_values()
-                
+            elif self.is_mapping_keyframe_shared[0]:                
                 # Add new gaussians to map gaussians
-                self.gaussians.add_from_pcd2_tensor(points, colors, rots, scales, z_values, [])
+                self._add_new_gaussians(with_trackable_filter=False)
                 
                 # Add new keyframe
-                newcam = copy.deepcopy(self.shared_cam)
-                newcam.on_cuda()
-                self.mapping_cams.append(newcam)
-                self.keyframe_idxs.append(newcam.cam_idx[0])
-                self.new_keyframes.append(len(self.mapping_cams)-1)
+                self._add_keyframe()
+
                 self.is_mapping_keyframe_shared[0] = 0
         
             if len(self.mapping_cams)>0:
-                
+                start = time.time()
+
                 # train once on new keyframe, and random
                 if len(self.new_keyframes) > 0:
                     train_idx = self.new_keyframes.pop(0)
@@ -256,6 +259,7 @@ class Mapper(SLAMParameters):
                         
                 self.training = False
                 self.train_iter += 1
+                self._mapping_iter_time += time.time() - start
                 # torch.cuda.empty_cache()
         if self.verbose:
             while True:
@@ -264,6 +268,8 @@ class Mapper(SLAMParameters):
         # End of data
         if self.save_results and not self.rerun_viewer:
             self.gaussians.save_ply(os.path.join(self.output_path, "scene.ply"))
+
+        print("[Mapping], Train iters: {:.2f}, Total time: {:.2f} sec, Average time per iteration: {:.2f} sec".format(self.train_iter, self._mapping_iter_time, self._mapping_iter_time/self.train_iter))
         
         self.calc_2d_metric()
     
